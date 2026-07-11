@@ -84,13 +84,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Học cờ vua và cờ tướng qua các video ngắn, dễ hiểu, tối ưu cho điện thoại. Lộ trình bài bản từ cơ bản đến nâng cao.",
       },
       { name: "author", content: "Lớp Học Cờ Online" },
-      { property: "og:title", content: "Lớp Học Cờ Online — Học Cờ Vua & Cờ Tướng" },
+      { property: "og:title", content: "Lớp Học Cờ Online — Học Cờ Vua & Cờ Tướng qua video" },
       {
         property: "og:description",
-        content: "Học cờ vua và cờ tướng qua video ngắn, tối ưu cho điện thoại.",
+        content: "Học cờ vua và cờ tướng qua các video ngắn, dễ hiểu, tối ưu cho điện thoại. Lộ trình bài bản từ cơ bản đến nâng cao.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Lớp Học Cờ Online — Học Cờ Vua & Cờ Tướng qua video" },
+      { name: "twitter:description", content: "Học cờ vua và cờ tướng qua các video ngắn, dễ hiểu, tối ưu cho điện thoại. Lộ trình bài bản từ cơ bản đến nâng cao." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a48a6d55-3b97-436a-80aa-0ffd380f9842/id-preview-848c644b--70d2ce47-1c69-4a14-82ac-92c6fdbb0ebf.lovable.app-1783739503737.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a48a6d55-3b97-436a-80aa-0ffd380f9842/id-preview-848c644b--70d2ce47-1c69-4a14-82ac-92c6fdbb0ebf.lovable.app-1783739503737.png" },
     ],
     links: [
       {
