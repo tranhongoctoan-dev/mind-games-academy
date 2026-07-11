@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as KhoaHocIndexRouteImport } from './routes/khoa-hoc.index'
 import { Route as KhoaHocSlugRouteImport } from './routes/khoa-hoc.$slug'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -31,36 +37,47 @@ const KhoaHocSlugRoute = KhoaHocSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/khoa-hoc/$slug': typeof KhoaHocSlugRoute
   '/khoa-hoc/': typeof KhoaHocIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/khoa-hoc/$slug': typeof KhoaHocSlugRoute
   '/khoa-hoc': typeof KhoaHocIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/khoa-hoc/$slug': typeof KhoaHocSlugRoute
   '/khoa-hoc/': typeof KhoaHocIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/khoa-hoc/$slug' | '/khoa-hoc/'
+  fullPaths: '/' | '/sitemap.xml' | '/khoa-hoc/$slug' | '/khoa-hoc/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/khoa-hoc/$slug' | '/khoa-hoc'
-  id: '__root__' | '/' | '/khoa-hoc/$slug' | '/khoa-hoc/'
+  to: '/' | '/sitemap.xml' | '/khoa-hoc/$slug' | '/khoa-hoc'
+  id: '__root__' | '/' | '/sitemap.xml' | '/khoa-hoc/$slug' | '/khoa-hoc/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   KhoaHocSlugRoute: typeof KhoaHocSlugRoute
   KhoaHocIndexRoute: typeof KhoaHocIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   KhoaHocSlugRoute: KhoaHocSlugRoute,
   KhoaHocIndexRoute: KhoaHocIndexRoute,
 }
