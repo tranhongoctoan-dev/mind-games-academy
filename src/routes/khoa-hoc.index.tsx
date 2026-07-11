@@ -4,7 +4,7 @@ import { Header } from "@/components/Header";
 import { CourseCard } from "@/components/CourseCard";
 import { courses, courseTypeLabels, type CourseType } from "@/lib/courses";
 
-export const Route = createFileRoute("/khoa-hoc")({
+export const Route = createFileRoute("/khoa-hoc/")({
   head: () => ({
     meta: [
       { title: "Tất cả khóa học — Lớp Học Cờ Online" },

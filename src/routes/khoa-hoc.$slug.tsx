@@ -118,7 +118,7 @@ function CourseDetail() {
         {/* Lesson list */}
         <h2 className="mt-8 font-display text-lg font-bold">Danh sách bài học</h2>
         <ul className="mt-3 space-y-2">
-          {course.lessons.map((lesson, index) => {
+          {course.lessons.map((lesson: Lesson, index: number) => {
             const isActive = index === activeIndex && lesson.free;
             return (
               <li key={index}>

@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as KhoaHocIndexRouteImport } from './routes/khoa-hoc.index'
+import { Route as KhoaHocSlugRouteImport } from './routes/khoa-hoc.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KhoaHocIndexRoute = KhoaHocIndexRouteImport.update({
+  id: '/khoa-hoc/',
+  path: '/khoa-hoc/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KhoaHocSlugRoute = KhoaHocSlugRouteImport.update({
+  id: '/khoa-hoc/$slug',
+  path: '/khoa-hoc/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/khoa-hoc/$slug': typeof KhoaHocSlugRoute
+  '/khoa-hoc/': typeof KhoaHocIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/khoa-hoc/$slug': typeof KhoaHocSlugRoute
+  '/khoa-hoc': typeof KhoaHocIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/khoa-hoc/$slug': typeof KhoaHocSlugRoute
+  '/khoa-hoc/': typeof KhoaHocIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/khoa-hoc/$slug' | '/khoa-hoc/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/khoa-hoc/$slug' | '/khoa-hoc'
+  id: '__root__' | '/' | '/khoa-hoc/$slug' | '/khoa-hoc/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  KhoaHocSlugRoute: typeof KhoaHocSlugRoute
+  KhoaHocIndexRoute: typeof KhoaHocIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/khoa-hoc/': {
+      id: '/khoa-hoc/'
+      path: '/khoa-hoc'
+      fullPath: '/khoa-hoc/'
+      preLoaderRoute: typeof KhoaHocIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/khoa-hoc/$slug': {
+      id: '/khoa-hoc/$slug'
+      path: '/khoa-hoc/$slug'
+      fullPath: '/khoa-hoc/$slug'
+      preLoaderRoute: typeof KhoaHocSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  KhoaHocSlugRoute: KhoaHocSlugRoute,
+  KhoaHocIndexRoute: KhoaHocIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
