@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Lock, Play, CheckCircle2, ArrowLeft, ShoppingCart, PlayCircle } from "lucide-react";
 import { Header } from "@/components/Header";
 import { PaymentModal } from "@/components/PaymentModal";
-import { getCourse, formatPrice } from "@/lib/courses";
+import { getCourse, formatPrice, type Lesson } from "@/lib/courses";
 
 export const Route = createFileRoute("/khoa-hoc/$slug")({
   loader: ({ params }) => {
