@@ -36,8 +36,8 @@ function CoursesPage() {
         </p>
 
         {/* Toggle */}
-        <div className="mt-6 grid grid-cols-2 gap-1.5 rounded-2xl border border-border bg-secondary p-1.5">
-          {(Object.keys(courseTypeLabels) as CourseType[]).map((t) => (
+        <div className={`mt-6 grid gap-1.5 rounded-2xl border border-border bg-secondary p-1.5 ${availableTypes.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
+          {availableTypes.map((t) => (
             <button
               key={t}
               onClick={() => setType(t)}
