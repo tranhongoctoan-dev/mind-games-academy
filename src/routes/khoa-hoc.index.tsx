@@ -20,8 +20,11 @@ export const Route = createFileRoute("/khoa-hoc/")({
 });
 
 function CoursesPage() {
-  const [type, setType] = useState<CourseType>("co-vua");
+  const [type, setType] = useState<CourseType>("co-tuong");
   const filtered = courses.filter((c) => c.type === type);
+  const availableTypes = (Object.keys(courseTypeLabels) as CourseType[]).filter((t) =>
+    courses.some((c) => c.type === t)
+  );
 
   return (
     <div className="min-h-screen bg-background">
