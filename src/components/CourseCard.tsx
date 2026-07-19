@@ -2,9 +2,11 @@ import { Link } from "@tanstack/react-router";
 import { PlayCircle, ArrowRight } from "lucide-react";
 import type { Course } from "@/lib/courses";
 import { formatPrice } from "@/lib/courses";
+import { getVideoThumbnailUrl } from "@/lib/video";
 
 export function CourseCard({ course }: { course: Course }) {
   const label = course.type === "co-vua" ? "Cờ Vua" : "Cờ Tướng";
+  const thumbnail = getVideoThumbnailUrl(course.lessons[0]);
   return (
     <Link
       to="/khoa-hoc/$slug"
@@ -12,12 +14,14 @@ export function CourseCard({ course }: { course: Course }) {
       className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-transform active:scale-[0.99]"
     >
       <div className="relative aspect-video overflow-hidden bg-navy">
-        <img
-          src={`https://i.ytimg.com/vi/${course.lessons[0].youtubeId}/hqdefault.jpg`}
-          alt={course.title}
-          loading="lazy"
-          className="h-full w-full object-cover opacity-90 transition-transform duration-500 group-hover:scale-105"
-        />
+        {thumbnail ? (
+          <img
+            src={thumbnail}
+            alt={course.title}
+            loading="lazy"
+            className="h-full w-full object-cover opacity-90 transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : null}
         <span className="absolute inset-0 grid place-items-center">
           <PlayCircle className="h-12 w-12 text-gold drop-shadow-lg" />
         </span>

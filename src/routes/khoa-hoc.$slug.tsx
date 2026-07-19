@@ -4,6 +4,7 @@ import { Lock, Play, CheckCircle2, ArrowLeft, ShoppingCart, PlayCircle } from "l
 import { Header } from "@/components/Header";
 import { PaymentModal } from "@/components/PaymentModal";
 import { getCourse, formatPrice, type Lesson } from "@/lib/courses";
+import { getVideoEmbedUrl, getVideoThumbnailUrl } from "@/lib/video";
 
 export const Route = createFileRoute("/khoa-hoc/$slug")({
   loader: ({ params }) => {
@@ -14,13 +15,16 @@ export const Route = createFileRoute("/khoa-hoc/$slug")({
   head: ({ loaderData }) => {
     if (!loaderData) return { meta: [{ title: "Không tìm thấy khóa học" }, { name: "robots", content: "noindex" }] };
     const { course } = loaderData;
+    const firstLesson = course.lessons[0];
+    const ogImage = getVideoThumbnailUrl(firstLesson);
+
     return {
       meta: [
         { title: `${course.title} — Lớp Học Cờ Online` },
         { name: "description", content: course.description },
         { property: "og:title", content: course.title },
         { property: "og:description", content: course.description },
-        { property: "og:image", content: `https://i.ytimg.com/vi/${course.lessons[0].youtubeId}/hqdefault.jpg` },
+        ...(ogImage ? [{ property: "og:image", content: ogImage }] : []),
       ],
     };
   },
@@ -45,6 +49,8 @@ function CourseDetail() {
 
   const activeLesson = course.lessons[activeIndex];
   const isLocked = !activeLesson.free;
+  const activeThumbnail = getVideoThumbnailUrl(activeLesson);
+  const activeEmbedUrl = getVideoEmbedUrl(activeLesson);
 
   const handleSelect = (index: number) => {
     const lesson = course.lessons[index];
@@ -69,25 +75,31 @@ function CourseDetail() {
                 onClick={() => setPayOpen(true)}
                 className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-navy-foreground"
               >
-                <img
-                  src={`https://i.ytimg.com/vi/${activeLesson.youtubeId}/hqdefault.jpg`}
-                  alt=""
-                  className="absolute inset-0 h-full w-full object-cover opacity-25"
-                />
+                {activeThumbnail ? (
+                  <img
+                    src={activeThumbnail}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover opacity-25"
+                  />
+                ) : null}
                 <span className="relative grid h-16 w-16 place-items-center rounded-full bg-gold/20 text-gold">
                   <Lock className="h-8 w-8" />
                 </span>
                 <span className="relative text-sm font-semibold">Bài học đã khóa — Mua để xem</span>
               </button>
-            ) : (
+            ) : activeEmbedUrl ? (
               <iframe
-                key={activeLesson.youtubeId + activeIndex}
+                key={activeLesson.videoId + activeIndex}
                 className="absolute inset-0 h-full w-full"
-                src={`https://www.youtube.com/embed/${activeLesson.youtubeId}`}
+                src={activeEmbedUrl}
                 title={activeLesson.title}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
+            ) : (
+              <div className="absolute inset-0 grid place-items-center px-6 text-center text-sm text-navy-foreground">
+                Video chưa sẵn sàng — vui lòng cấu hình VITE_BUNNY_LIBRARY_ID.
+              </div>
             )}
           </div>
         </div>
