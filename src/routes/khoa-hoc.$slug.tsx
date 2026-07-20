@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
-import { Lock, Play, CheckCircle2, ArrowLeft, ShoppingCart, PlayCircle } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Lock, ArrowLeft, ShoppingCart, ChevronUp, ChevronDown, CheckCircle2, PlayCircle, Play } from "lucide-react";
 import { Header } from "@/components/Header";
 import { PaymentModal } from "@/components/PaymentModal";
 import { getCourse, formatPrice, type Lesson } from "@/lib/courses";
@@ -17,7 +17,6 @@ export const Route = createFileRoute("/khoa-hoc/$slug")({
     const { course } = loaderData;
     const firstLesson = course.lessons[0];
     const ogImage = getVideoThumbnailUrl(firstLesson);
-
     return {
       meta: [
         { title: `${course.title} — Lớp Học Cờ Online` },
@@ -46,63 +45,105 @@ function CourseDetail() {
   const { course } = Route.useLoaderData();
   const [activeIndex, setActiveIndex] = useState(0);
   const [payOpen, setPayOpen] = useState(false);
+  const touchStartY = useRef<number | null>(null);
+  const wheelLock = useRef(false);
+
+  const total = course.lessons.length;
+  const goTo = useCallback(
+    (i: number) => {
+      const clamped = Math.max(0, Math.min(total - 1, i));
+      setActiveIndex(clamped);
+    },
+    [total]
+  );
+
+  const next = () => goTo(activeIndex + 1);
+  const prev = () => goTo(activeIndex - 1);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartY.current == null) return;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dy) > 60) {
+      if (dy < 0) next();
+      else prev();
+    }
+    touchStartY.current = null;
+  };
+  const onWheel = (e: React.WheelEvent) => {
+    if (wheelLock.current) return;
+    if (Math.abs(e.deltaY) < 30) return;
+    wheelLock.current = true;
+    if (e.deltaY > 0) next();
+    else prev();
+    setTimeout(() => (wheelLock.current = false), 500);
+  };
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowDown") next();
+      else if (e.key === "ArrowUp") prev();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeIndex]);
 
   const activeLesson = course.lessons[activeIndex];
   const isLocked = !activeLesson.free;
-  const activeThumbnail = getVideoThumbnailUrl(activeLesson);
-  const activeEmbedUrl = getVideoEmbedUrl(activeLesson);
-
-  const handleSelect = (index: number) => {
-    const lesson = course.lessons[index];
-    if (lesson.free) {
-      setActiveIndex(index);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      setPayOpen(true);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Video area */}
-      <div className="bg-navy">
+      {/* Feed player */}
+      <div
+        className="relative bg-navy select-none"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+        onWheel={onWheel}
+      >
         <div className="mx-auto max-w-5xl">
           <div className="relative aspect-video w-full bg-black">
-            {isLocked ? (
+            <FeedSlide
+              key={activeIndex}
+              lesson={activeLesson}
+              locked={isLocked}
+              price={course.price}
+              onBuy={() => setPayOpen(true)}
+            />
+
+            {/* Nav buttons */}
+            <div className="pointer-events-none absolute right-3 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-2">
               <button
-                onClick={() => setPayOpen(true)}
-                className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-navy-foreground"
+                onClick={prev}
+                disabled={activeIndex === 0}
+                aria-label="Bài trước"
+                className="pointer-events-auto grid h-11 w-11 place-items-center rounded-full bg-black/50 text-white backdrop-blur disabled:opacity-30"
               >
-                {activeThumbnail ? (
-                  <img
-                    src={activeThumbnail}
-                    alt=""
-                    className="absolute inset-0 h-full w-full object-cover opacity-25"
-                  />
-                ) : null}
-                <span className="relative grid h-16 w-16 place-items-center rounded-full bg-gold/20 text-gold">
-                  <Lock className="h-8 w-8" />
-                </span>
-                <span className="relative text-sm font-semibold">Bài học đã khóa — Mua để xem</span>
+                <ChevronUp className="h-5 w-5" />
               </button>
-            ) : activeEmbedUrl ? (
-              <iframe
-                key={activeLesson.videoId + activeIndex}
-                className="absolute inset-0 h-full w-full"
-                src={activeEmbedUrl}
-                title={activeLesson.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            ) : (
-              <div className="absolute inset-0 grid place-items-center px-6 text-center text-sm text-navy-foreground">
-                Video chưa sẵn sàng — vui lòng cấu hình VITE_BUNNY_LIBRARY_ID.
-              </div>
-            )}
+              <button
+                onClick={next}
+                disabled={activeIndex === total - 1}
+                aria-label="Bài tiếp theo"
+                className="pointer-events-auto grid h-11 w-11 place-items-center rounded-full bg-gold text-gold-foreground shadow-gold disabled:opacity-40"
+              >
+                <ChevronDown className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Progress pill */}
+            <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-black/50 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
+              {activeIndex + 1} / {total}
+            </div>
           </div>
         </div>
+        <p className="py-2 text-center text-xs text-navy-foreground/70">
+          Vuốt lên / xuống hoặc dùng nút để chuyển bài
+        </p>
       </div>
 
       <div className="mx-auto max-w-5xl px-5 py-6">
@@ -112,13 +153,12 @@ function CourseDetail() {
 
         <div className="mt-3 flex items-center gap-2 text-xs font-medium text-muted-foreground">
           <span className="rounded-full bg-accent px-2 py-0.5 text-accent-foreground">{course.level}</span>
-          <span>{course.lessons.length} bài học</span>
+          <span>{total} bài học</span>
         </div>
         <h1 className="mt-2 font-display text-2xl font-bold leading-snug">{course.title}</h1>
         <p className="mt-1 text-sm font-medium text-gold">{course.instructor}</p>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{course.description}</p>
 
-        {/* Buy button */}
         <button
           onClick={() => setPayOpen(true)}
           className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-gold py-3.5 text-base font-bold text-gold-foreground shadow-gold active:scale-[0.99]"
@@ -127,19 +167,16 @@ function CourseDetail() {
           Mua khóa học · {formatPrice(course.price)}
         </button>
 
-        {/* Lesson list */}
         <h2 className="mt-8 font-display text-lg font-bold">Danh sách bài học</h2>
         <ul className="mt-3 space-y-2">
           {course.lessons.map((lesson: Lesson, index: number) => {
-            const isActive = index === activeIndex && lesson.free;
+            const isActive = index === activeIndex;
             return (
               <li key={index}>
                 <button
-                  onClick={() => handleSelect(index)}
+                  onClick={() => goTo(index)}
                   className={`flex w-full items-center gap-3 rounded-2xl border p-3.5 text-left transition-colors ${
-                    isActive
-                      ? "border-gold bg-accent/50"
-                      : "border-border bg-card hover:bg-secondary/60"
+                    isActive ? "border-gold bg-accent/50" : "border-border bg-card hover:bg-secondary/60"
                   }`}
                 >
                   <span
@@ -178,7 +215,67 @@ function CourseDetail() {
         onClose={() => setPayOpen(false)}
         courseTitle={course.title}
         price={course.price}
+        transferNote={`KH ${course.slug}`.slice(0, 50)}
       />
     </div>
+  );
+}
+
+function FeedSlide({
+  lesson,
+  locked,
+  price,
+  onBuy,
+}: {
+  lesson: Lesson;
+  locked: boolean;
+  price: number;
+  onBuy: () => void;
+}) {
+  const thumb = getVideoThumbnailUrl(lesson);
+  const embed = getVideoEmbedUrl(lesson);
+
+  if (locked) {
+    return (
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center text-navy-foreground">
+        {thumb ? (
+          <img src={thumb} alt="" className="absolute inset-0 h-full w-full object-cover opacity-20" />
+        ) : null}
+        <span className="relative grid h-16 w-16 place-items-center rounded-full bg-gold/20 text-gold">
+          <Lock className="h-8 w-8" />
+        </span>
+        <div className="relative">
+          <p className="text-base font-bold">{lesson.title}</p>
+          <p className="mt-1 text-sm text-navy-foreground/80">
+            Khóa học cần thanh toán {formatPrice(price)} để xem tiếp
+          </p>
+        </div>
+        <button
+          onClick={onBuy}
+          className="relative flex items-center justify-center gap-2 rounded-2xl bg-gold px-6 py-3 text-sm font-bold text-gold-foreground shadow-gold active:scale-[0.99]"
+        >
+          <ShoppingCart className="h-4 w-4" />
+          Mở khóa · Quét VietQR TPBank
+        </button>
+      </div>
+    );
+  }
+
+  if (!embed) {
+    return (
+      <div className="absolute inset-0 grid place-items-center px-6 text-center text-sm text-navy-foreground">
+        Video chưa sẵn sàng.
+      </div>
+    );
+  }
+
+  return (
+    <iframe
+      className="absolute inset-0 h-full w-full"
+      src={embed}
+      title={lesson.title}
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowFullScreen
+    />
   );
 }

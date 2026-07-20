@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { X, Copy, QrCode, MessageCircle } from "lucide-react";
-import { paymentInfo } from "@/lib/payment";
+import { X, Copy, MessageCircle } from "lucide-react";
+import { paymentInfo, buildVietQrUrl } from "@/lib/payment";
 import { formatPrice } from "@/lib/courses";
 
 interface PaymentModalProps {
@@ -8,9 +8,10 @@ interface PaymentModalProps {
   onClose: () => void;
   courseTitle: string;
   price: number;
+  transferNote?: string;
 }
 
-export function PaymentModal({ open, onClose, courseTitle, price }: PaymentModalProps) {
+export function PaymentModal({ open, onClose, courseTitle, price, transferNote }: PaymentModalProps) {
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
@@ -21,6 +22,9 @@ export function PaymentModal({ open, onClose, courseTitle, price }: PaymentModal
   }, [open]);
 
   if (!open) return null;
+
+  const addInfo = transferNote ?? `KH ${courseTitle}`.slice(0, 50);
+  const qrUrl = buildVietQrUrl({ amount: price, addInfo });
 
   const copy = (text: string) => {
     navigator.clipboard?.writeText(text);
@@ -53,22 +57,17 @@ export function PaymentModal({ open, onClose, courseTitle, price }: PaymentModal
           <span className="text-xl font-bold text-gold">{formatPrice(price)}</span>
         </div>
 
-        {/* QR */}
+        {/* VietQR */}
         <div className="mb-4 flex flex-col items-center">
-          <div className="grid aspect-square w-48 place-items-center overflow-hidden rounded-2xl border-2 border-dashed border-gold/60 bg-secondary">
-            {paymentInfo.qrImageUrl ? (
-              <img
-                src={paymentInfo.qrImageUrl}
-                alt="Mã QR chuyển khoản"
-                className="h-full w-full object-contain"
-              />
-            ) : (
-              <div className="flex flex-col items-center gap-2 p-4 text-center text-muted-foreground">
-                <QrCode className="h-10 w-10" />
-                <span className="text-xs">Thêm ảnh mã QR của bạn trong src/lib/payment.ts</span>
-              </div>
-            )}
+          <div className="overflow-hidden rounded-2xl border-2 border-dashed border-gold/60 bg-white p-2">
+            <img
+              src={qrUrl}
+              alt="Mã VietQR TPBank"
+              className="h-64 w-64 object-contain"
+              loading="lazy"
+            />
           </div>
+          <p className="mt-2 text-xs text-muted-foreground">Quét mã bằng app ngân hàng để chuyển khoản tự động</p>
         </div>
 
         {/* Bank info */}
@@ -76,6 +75,7 @@ export function PaymentModal({ open, onClose, courseTitle, price }: PaymentModal
           <InfoRow label="Ngân hàng" value={paymentInfo.bankName} />
           <InfoRow label="Số tài khoản" value={paymentInfo.accountNumber} onCopy={() => copy(paymentInfo.accountNumber)} />
           <InfoRow label="Chủ tài khoản" value={paymentInfo.accountHolder} />
+          <InfoRow label="Nội dung CK" value={addInfo} onCopy={() => copy(addInfo)} />
         </div>
 
         {/* Instruction */}
@@ -100,12 +100,12 @@ export function PaymentModal({ open, onClose, courseTitle, price }: PaymentModal
 
 function InfoRow({ label, value, onCopy }: { label: string; value: string; onCopy?: () => void }) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-border bg-secondary/50 px-4 py-3">
-      <span className="text-sm text-muted-foreground">{label}</span>
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-semibold">{value}</span>
+    <div className="flex items-center justify-between gap-2 rounded-xl border border-border bg-secondary/50 px-4 py-3">
+      <span className="shrink-0 text-sm text-muted-foreground">{label}</span>
+      <div className="flex min-w-0 items-center gap-2">
+        <span className="truncate text-sm font-semibold">{value}</span>
         {onCopy && (
-          <button onClick={onCopy} aria-label="Sao chép" className="text-gold">
+          <button onClick={onCopy} aria-label="Sao chép" className="shrink-0 text-gold">
             <Copy className="h-4 w-4" />
           </button>
         )}
