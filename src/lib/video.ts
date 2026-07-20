@@ -2,6 +2,8 @@ import type { Lesson } from "./courses";
 
 const BUNNY_LIBRARY_ID =
   (import.meta.env.VITE_BUNNY_LIBRARY_ID as string | undefined) ?? "707946";
+const BUNNY_CDN_HOSTNAME =
+  (import.meta.env.VITE_BUNNY_CDN_HOSTNAME as string | undefined) ?? "";
 
 export function getLessonProvider(lesson: Lesson): "youtube" | "bunny" {
   return lesson.provider ?? "youtube";
