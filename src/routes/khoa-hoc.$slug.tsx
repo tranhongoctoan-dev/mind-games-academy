@@ -141,29 +141,30 @@ function CourseDetail() {
             <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-black/50 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
               {activeIndex + 1} / {total}
             </div>
+
+            {/* Compact nav pills — pinned to right edge, only visible when not fullscreen */}
+            {!fullscreen && (
+              <div className="absolute right-1.5 top-1/2 z-[60] flex w-7 -translate-y-1/2 flex-col gap-1 rounded-full bg-gold/95 p-0.5 opacity-70 shadow-md ring-1 ring-white/30 backdrop-blur-sm transition-opacity hover:opacity-100 active:opacity-100">
+                <button
+                  onClick={prev}
+                  disabled={activeIndex === 0}
+                  aria-label="Bài trước"
+                  className="grid h-6 w-6 place-items-center rounded-full text-gold-foreground active:scale-95 disabled:opacity-30"
+                >
+                  <ChevronUp className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={next}
+                  disabled={activeIndex === total - 1}
+                  aria-label="Bài tiếp theo"
+                  className="grid h-6 w-6 place-items-center rounded-full text-gold-foreground active:scale-95 disabled:opacity-30"
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Navigation pills — fixed to right-center of the video board */}
-          <div
-            className="absolute right-3 top-1/2 z-[60] flex -translate-y-1/2 flex-col gap-2 rounded-full bg-gold/95 p-1.5 shadow-xl ring-2 ring-white/40 backdrop-blur-sm"
-          >
-            <button
-              onClick={prev}
-              disabled={activeIndex === 0}
-              aria-label="Bài trước"
-              className="grid h-10 w-10 place-items-center rounded-full text-gold-foreground transition hover:bg-white/20 active:scale-95 disabled:opacity-30"
-            >
-              <ChevronUp className="h-5 w-5" />
-            </button>
-            <button
-              onClick={next}
-              disabled={activeIndex === total - 1}
-              aria-label="Bài tiếp theo"
-              className="grid h-10 w-10 place-items-center rounded-full text-gold-foreground transition hover:bg-white/20 active:scale-95 disabled:opacity-30"
-            >
-              <ChevronDown className="h-5 w-5" />
-            </button>
-          </div>
         </div>
         <p className="py-2 text-center text-xs text-navy-foreground/70">
           Vuốt lên / xuống hoặc dùng nút để chuyển bài
@@ -267,24 +268,22 @@ function CourseDetail() {
               fill
             />
 
-            <div
-              className="absolute right-3 top-1/2 z-[9999] flex -translate-y-1/2 flex-col gap-2 rounded-full bg-gold/95 p-1.5 shadow-2xl ring-2 ring-white/40 backdrop-blur-sm"
-            >
+            <div className="absolute right-1.5 top-1/2 z-[9999] flex w-7 -translate-y-1/2 flex-col gap-1 rounded-full bg-gold/95 p-0.5 opacity-70 shadow-md ring-1 ring-white/30 backdrop-blur-sm transition-opacity hover:opacity-100 active:opacity-100">
               <button
                 onClick={prev}
                 disabled={activeIndex === 0}
                 aria-label="Bài trước"
-                className="grid h-11 w-11 place-items-center rounded-full text-gold-foreground transition hover:bg-white/20 active:scale-95 disabled:opacity-30"
+                className="grid h-6 w-6 place-items-center rounded-full text-gold-foreground active:scale-95 disabled:opacity-30"
               >
-                <ChevronUp className="h-6 w-6" />
+                <ChevronUp className="h-4 w-4" />
               </button>
               <button
                 onClick={next}
                 disabled={activeIndex === total - 1}
                 aria-label="Bài tiếp theo"
-                className="grid h-11 w-11 place-items-center rounded-full text-gold-foreground transition hover:bg-white/20 active:scale-95 disabled:opacity-30"
+                className="grid h-6 w-6 place-items-center rounded-full text-gold-foreground active:scale-95 disabled:opacity-30"
               >
-                <ChevronDown className="h-6 w-6" />
+                <ChevronDown className="h-4 w-4" />
               </button>
             </div>
           </div>
