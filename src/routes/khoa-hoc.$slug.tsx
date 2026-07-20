@@ -267,12 +267,14 @@ function CourseDetail() {
               fill
             />
 
-            <div className="pointer-events-none absolute right-3 bottom-16 z-10 flex flex-col gap-2">
+            <div
+              className="absolute right-3 top-1/2 z-[9999] flex -translate-y-1/2 flex-col gap-2 rounded-full bg-gold/95 p-1.5 shadow-2xl ring-2 ring-white/40 backdrop-blur-sm"
+            >
               <button
                 onClick={prev}
                 disabled={activeIndex === 0}
                 aria-label="Bài trước"
-                className="pointer-events-auto grid h-11 w-11 place-items-center rounded-full bg-gold text-gold-foreground shadow-lg ring-2 ring-white/30 opacity-95 backdrop-blur-sm transition hover:opacity-100 hover:shadow-xl active:scale-95 disabled:opacity-30"
+                className="grid h-11 w-11 place-items-center rounded-full text-gold-foreground transition hover:bg-white/20 active:scale-95 disabled:opacity-30"
               >
                 <ChevronUp className="h-6 w-6" />
               </button>
@@ -280,7 +282,7 @@ function CourseDetail() {
                 onClick={next}
                 disabled={activeIndex === total - 1}
                 aria-label="Bài tiếp theo"
-                className="pointer-events-auto grid h-11 w-11 place-items-center rounded-full bg-gold text-gold-foreground shadow-lg ring-2 ring-white/30 opacity-95 backdrop-blur-sm transition hover:opacity-100 hover:shadow-xl active:scale-95 disabled:opacity-30"
+                className="grid h-11 w-11 place-items-center rounded-full text-gold-foreground transition hover:bg-white/20 active:scale-95 disabled:opacity-30"
               >
                 <ChevronDown className="h-6 w-6" />
               </button>
