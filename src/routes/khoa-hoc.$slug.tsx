@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Lock, ArrowLeft, ShoppingCart, ChevronUp, ChevronDown, CheckCircle2, PlayCircle, Play, Maximize2, X } from "lucide-react";
+import { Lock, ArrowLeft, ShoppingCart, CheckCircle2, PlayCircle, Play } from "lucide-react";
 import { Header } from "@/components/Header";
 import { PaymentModal } from "@/components/PaymentModal";
 import { getCourse, formatPrice, getCourseCoverImage, type Lesson } from "@/lib/courses";
@@ -45,130 +45,84 @@ function CourseDetail() {
   const { course } = Route.useLoaderData();
   const [activeIndex, setActiveIndex] = useState(0);
   const [payOpen, setPayOpen] = useState(false);
-  const [fullscreen, setFullscreen] = useState(false);
-  const touchStartY = useRef<number | null>(null);
-  const wheelLock = useRef(false);
 
+  const feedRef = useRef<HTMLDivElement | null>(null);
+  const slideRefs = useRef<Array<HTMLElement | null>>([]);
   const total = course.lessons.length;
-  const goTo = useCallback(
-    (i: number) => setActiveIndex(Math.max(0, Math.min(total - 1, i))),
-    [total]
-  );
 
-  const next = useCallback(() => goTo(activeIndex + 1), [goTo, activeIndex]);
-  const prev = useCallback(() => goTo(activeIndex - 1), [goTo, activeIndex]);
-
-  const onTouchStart = (e: React.TouchEvent) => {
-    touchStartY.current = e.touches[0].clientY;
-  };
-  const onTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartY.current == null) return;
-    const dy = e.changedTouches[0].clientY - touchStartY.current;
-    if (Math.abs(dy) > 60) {
-      if (dy < 0) next();
-      else prev();
-    }
-    touchStartY.current = null;
-  };
-  const onWheel = (e: React.WheelEvent) => {
-    if (wheelLock.current) return;
-    if (Math.abs(e.deltaY) < 30) return;
-    wheelLock.current = true;
-    if (e.deltaY > 0) next();
-    else prev();
-    setTimeout(() => (wheelLock.current = false), 500);
-  };
-
+  // Track which slide is currently in view
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowDown") next();
-      else if (e.key === "ArrowUp") prev();
-      else if (e.key === "Escape") setFullscreen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [next, prev]);
+    const container = feedRef.current;
+    if (!container) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        // Pick the entry with the highest visibility ratio
+        let best: IntersectionObserverEntry | null = null;
+        for (const e of entries) {
+          if (!best || e.intersectionRatio > best.intersectionRatio) best = e;
+        }
+        if (best && best.isIntersecting) {
+          const idx = Number((best.target as HTMLElement).dataset.index);
+          if (!Number.isNaN(idx)) setActiveIndex(idx);
+        }
+      },
+      { root: container, threshold: [0.5, 0.75, 1] }
+    );
+    slideRefs.current.forEach((el) => el && io.observe(el));
+    return () => io.disconnect();
+  }, [total]);
 
-  // Lock body scroll while fullscreen
-  useEffect(() => {
-    if (!fullscreen) return;
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [fullscreen]);
+  const goTo = useCallback((i: number) => {
+    const el = slideRefs.current[i];
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
 
   const activeLesson = course.lessons[activeIndex];
-  const isLocked = !activeLesson.free;
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Inline feed player */}
+      {/* TikTok-style vertical scroll-snap feed */}
       <div
-        className="relative bg-navy select-none"
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-        onWheel={onWheel}
+        ref={feedRef}
+        className="relative h-[100dvh] w-full snap-y snap-mandatory overflow-y-scroll bg-black overscroll-contain"
+        style={{ scrollSnapType: "y mandatory" }}
       >
-        <div className="relative mx-auto max-w-5xl pb-14">
-          <div className="relative aspect-video w-full bg-black">
-            {!fullscreen && (
-              <FeedSlide
-                key={`inline-${activeIndex}`}
-                lesson={activeLesson}
-                locked={isLocked}
-                price={course.price}
-                onBuy={() => setPayOpen(true)}
-                onEnded={next}
-                autoplay={false}
-              />
-            )}
+        {course.lessons.map((lesson, index) => (
+          <section
+            key={index}
+            data-index={index}
+            ref={(el) => {
+              slideRefs.current[index] = el;
+            }}
+            className="relative flex h-[100dvh] w-full snap-start snap-always items-center justify-center bg-black"
+          >
+            <FeedSlide
+              lesson={lesson}
+              locked={!lesson.free}
+              price={course.price}
+              onBuy={() => setPayOpen(true)}
+              onEnded={() => goTo(index + 1)}
+              active={index === activeIndex}
+            />
 
-            {/* Fullscreen toggle */}
-            {!isLocked && !fullscreen && (
-              <button
-                onClick={() => setFullscreen(true)}
-                aria-label="Xem toàn màn hình"
-                className="absolute bottom-3 left-3 z-10 grid h-11 w-11 place-items-center rounded-full bg-black/60 text-white backdrop-blur active:scale-95"
-              >
-                <Maximize2 className="h-5 w-5" />
-              </button>
-            )}
-
-            <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-black/50 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
-              {activeIndex + 1} / {total}
+            {/* Overlay: index + lesson title */}
+            <div className="pointer-events-none absolute left-3 top-3 z-10 flex items-center gap-2">
+              <span className="rounded-full bg-black/60 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
+                {index + 1} / {total}
+              </span>
             </div>
-
-            {/* Compact nav pills — pinned to right edge, only visible when not fullscreen */}
-            {!fullscreen && (
-              <div className="absolute right-1.5 top-1/2 z-[60] flex w-7 -translate-y-1/2 flex-col gap-1 rounded-full bg-gold/95 p-0.5 opacity-70 shadow-md ring-1 ring-white/30 backdrop-blur-sm transition-opacity hover:opacity-100 active:opacity-100">
-                <button
-                  onClick={prev}
-                  disabled={activeIndex === 0}
-                  aria-label="Bài trước"
-                  className="grid h-6 w-6 place-items-center rounded-full text-gold-foreground active:scale-95 disabled:opacity-30"
-                >
-                  <ChevronUp className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={next}
-                  disabled={activeIndex === total - 1}
-                  aria-label="Bài tiếp theo"
-                  className="grid h-6 w-6 place-items-center rounded-full text-gold-foreground active:scale-95 disabled:opacity-30"
-                >
-                  <ChevronDown className="h-4 w-4" />
-                </button>
-              </div>
-            )}
-          </div>
-
-        </div>
-        <p className="py-2 text-center text-xs text-navy-foreground/70">
-          Vuốt lên / xuống hoặc dùng nút để chuyển bài
-        </p>
+            <div className="pointer-events-none absolute inset-x-0 bottom-6 z-10 px-4 text-center">
+              <p className="mx-auto max-w-md truncate rounded-full bg-black/50 px-4 py-1.5 text-sm font-semibold text-white backdrop-blur">
+                {lesson.title}
+              </p>
+              <p className="mt-2 text-[11px] font-medium text-white/70">
+                Vuốt lên để xem bài tiếp theo
+              </p>
+            </div>
+          </section>
+        ))}
       </div>
 
       <div className="mx-auto max-w-5xl px-5 py-6">
@@ -235,65 +189,6 @@ function CourseDetail() {
         </ul>
       </div>
 
-      {/* Custom fullscreen overlay with swipe */}
-      {fullscreen && (
-        <div
-          className="fixed inset-0 z-50 flex flex-col bg-black text-white select-none"
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
-          onWheel={onWheel}
-        >
-          <div className="flex items-center justify-between px-4 py-3">
-            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold backdrop-blur">
-              {activeIndex + 1} / {total}
-            </span>
-            <button
-              onClick={() => setFullscreen(false)}
-              aria-label="Đóng toàn màn hình"
-              className="grid h-11 w-11 place-items-center rounded-full bg-white/10 backdrop-blur active:scale-95"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-
-          <div className="relative flex-1">
-            <FeedSlide
-              key={`fs-${activeIndex}`}
-              lesson={activeLesson}
-              locked={isLocked}
-              price={course.price}
-              onBuy={() => setPayOpen(true)}
-              onEnded={next}
-              autoplay
-              fill
-            />
-
-            <div className="absolute right-1.5 top-1/2 z-[9999] flex w-7 -translate-y-1/2 flex-col gap-1 rounded-full bg-gold/95 p-0.5 opacity-70 shadow-md ring-1 ring-white/30 backdrop-blur-sm transition-opacity hover:opacity-100 active:opacity-100">
-              <button
-                onClick={prev}
-                disabled={activeIndex === 0}
-                aria-label="Bài trước"
-                className="grid h-6 w-6 place-items-center rounded-full text-gold-foreground active:scale-95 disabled:opacity-30"
-              >
-                <ChevronUp className="h-4 w-4" />
-              </button>
-              <button
-                onClick={next}
-                disabled={activeIndex === total - 1}
-                aria-label="Bài tiếp theo"
-                className="grid h-6 w-6 place-items-center rounded-full text-gold-foreground active:scale-95 disabled:opacity-30"
-              >
-                <ChevronDown className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-          <p className="py-3 text-center text-xs text-white/70">
-            Vuốt lên: bài tiếp · Vuốt xuống: bài trước
-          </p>
-        </div>
-      )}
-
       <PaymentModal
         open={payOpen}
         onClose={() => setPayOpen(false)}
@@ -312,30 +207,26 @@ function FeedSlide({
   price,
   onBuy,
   onEnded,
-  autoplay = false,
-  fill = false,
+  active,
 }: {
   lesson: Lesson;
   locked: boolean;
   price: number;
   onBuy: () => void;
   onEnded?: () => void;
-  autoplay?: boolean;
-  fill?: boolean;
+  active: boolean;
 }) {
   const thumb = getVideoThumbnailUrl(lesson);
-  const embed = getVideoEmbedUrl(lesson, { autoplay });
+  const embed = getVideoEmbedUrl(lesson, { autoplay: active });
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const provider = getLessonProvider(lesson);
 
-  // Detect video-ended via postMessage (YouTube IFrame API) without needing SDK
   useEffect(() => {
-    if (locked || !onEnded) return;
+    if (locked || !onEnded || !active) return;
     const iframe = iframeRef.current;
     if (!iframe) return;
 
     if (provider === "youtube") {
-      // Handshake to receive events
       const sendListening = () => {
         iframe.contentWindow?.postMessage(
           JSON.stringify({ event: "listening", id: 1, channel: "widget" }),
@@ -348,7 +239,6 @@ function FeedSlide({
       };
       const onLoad = () => sendListening();
       iframe.addEventListener("load", onLoad);
-      // In case already loaded
       sendListening();
 
       const onMsg = (e: MessageEvent) => {
@@ -356,7 +246,6 @@ function FeedSlide({
         if (!e.origin.includes("youtube.com")) return;
         try {
           const data = JSON.parse(e.data);
-          // Ended state === 0
           if (data?.event === "onStateChange" && data?.info === 0) {
             onEnded();
           }
@@ -370,22 +259,20 @@ function FeedSlide({
         window.removeEventListener("message", onMsg);
       };
     }
-  }, [locked, onEnded, provider, embed]);
-
-  const posClass = fill ? "absolute inset-0 h-full w-full" : "absolute inset-0 h-full w-full";
+  }, [locked, onEnded, provider, embed, active]);
 
   if (locked) {
     return (
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center text-navy-foreground">
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center text-white">
         {thumb ? (
-          <img src={thumb} alt="" className="absolute inset-0 h-full w-full object-cover opacity-20" />
+          <img src={thumb} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />
         ) : null}
         <span className="relative grid h-16 w-16 place-items-center rounded-full bg-gold/20 text-gold">
           <Lock className="h-8 w-8" />
         </span>
         <div className="relative">
           <p className="text-base font-bold">{lesson.title}</p>
-          <p className="mt-1 text-sm text-navy-foreground/80">
+          <p className="mt-1 text-sm text-white/80">
             Khóa học cần thanh toán {formatPrice(price)} để xem tiếp
           </p>
         </div>
@@ -400,9 +287,22 @@ function FeedSlide({
     );
   }
 
+  if (!active) {
+    // Show poster only; don't mount iframe to avoid multi-audio
+    return (
+      <div className="absolute inset-0">
+        {thumb ? (
+          <img src={thumb} alt={lesson.title} className="h-full w-full object-contain" />
+        ) : (
+          <div className="grid h-full w-full place-items-center text-sm text-white/70">…</div>
+        )}
+      </div>
+    );
+  }
+
   if (!embed) {
     return (
-      <div className="absolute inset-0 grid place-items-center px-6 text-center text-sm text-navy-foreground">
+      <div className="absolute inset-0 grid place-items-center px-6 text-center text-sm text-white/70">
         Video chưa sẵn sàng.
       </div>
     );
@@ -411,7 +311,7 @@ function FeedSlide({
   return (
     <iframe
       ref={iframeRef}
-      className={posClass}
+      className="absolute inset-0 h-full w-full"
       src={embed}
       title={lesson.title}
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
