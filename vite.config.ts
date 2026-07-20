@@ -13,7 +13,9 @@ export default defineConfig({
         generatedRouteTree: 'routeTree.gen.ts',
       },
     }),
-    nitro(),
+    nitro({
+      preset: 'vercel',
+    }),
     viteReact(),
     tsconfigPaths(),
   ],
