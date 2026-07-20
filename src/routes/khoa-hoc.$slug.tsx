@@ -132,7 +132,7 @@ function CourseDetail() {
               <button
                 onClick={() => setFullscreen(true)}
                 aria-label="Xem toàn màn hình"
-                className="absolute bottom-3 right-3 z-10 grid h-11 w-11 place-items-center rounded-full bg-black/60 text-white backdrop-blur active:scale-95"
+                className="absolute bottom-3 left-3 z-10 grid h-11 w-11 place-items-center rounded-full bg-black/60 text-white backdrop-blur active:scale-95"
               >
                 <Maximize2 className="h-5 w-5" />
               </button>
