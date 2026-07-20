@@ -25,9 +25,16 @@ export function getVideoEmbedUrl(lesson: Lesson, opts?: { autoplay?: boolean }):
 
 export function getVideoThumbnailUrl(lesson: Lesson): string | null {
   if (getLessonProvider(lesson) === "bunny") {
-    if (!BUNNY_LIBRARY_ID) return null;
-    return `https://video.bunnycdn.com/${BUNNY_LIBRARY_ID}/${lesson.videoId}/thumbnail.jpg`;
+    if (BUNNY_CDN_HOSTNAME) {
+      return `https://${BUNNY_CDN_HOSTNAME}/${lesson.videoId}/thumbnail.jpg`;
+    }
+    // Fallback preview poster via Bunny's iframe delivery
+    if (BUNNY_LIBRARY_ID) {
+      return `https://iframe.mediadelivery.net/preview.webp?libraryId=${BUNNY_LIBRARY_ID}&videoId=${lesson.videoId}`;
+    }
+    return null;
   }
 
   return `https://i.ytimg.com/vi/${lesson.videoId}/hqdefault.jpg`;
 }
+
