@@ -1,12 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import type { Course } from "@/lib/courses";
-import { formatPrice } from "@/lib/courses";
+import { formatPrice, getCourseCoverImage } from "@/lib/courses";
 import { getVideoThumbnailUrl } from "@/lib/video";
 
 export function CourseCard({ course }: { course: Course }) {
   const label = course.type === "co-vua" ? "Cờ Vua" : "Cờ Tướng";
-  const thumbnail = getVideoThumbnailUrl(course.lessons[0]);
+  const thumbnail = getCourseCoverImage(course) ?? getVideoThumbnailUrl(course.lessons[0]);
   return (
     <Link
       to="/khoa-hoc/$slug"

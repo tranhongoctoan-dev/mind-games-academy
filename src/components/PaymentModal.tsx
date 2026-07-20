@@ -9,9 +9,10 @@ interface PaymentModalProps {
   courseTitle: string;
   price: number;
   transferNote?: string;
+  coverImage?: string | null;
 }
 
-export function PaymentModal({ open, onClose, courseTitle, price, transferNote }: PaymentModalProps) {
+export function PaymentModal({ open, onClose, courseTitle, price, transferNote, coverImage }: PaymentModalProps) {
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
@@ -38,6 +39,16 @@ export function PaymentModal({ open, onClose, courseTitle, price, transferNote }
         aria-hidden
       />
       <div className="relative z-10 max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-3xl border border-border bg-card p-5 shadow-card sm:rounded-3xl">
+        {coverImage ? (
+          <div className="mb-4 overflow-hidden rounded-2xl">
+            <img
+              src={coverImage}
+              alt={courseTitle}
+              loading="lazy"
+              className="h-40 w-full object-cover"
+            />
+          </div>
+        ) : null}
         <div className="mb-4 flex items-start justify-between gap-3">
           <div>
             <h2 className="font-display text-xl font-bold">Thanh toán khóa học</h2>

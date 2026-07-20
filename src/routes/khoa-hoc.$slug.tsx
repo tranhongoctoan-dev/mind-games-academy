@@ -3,7 +3,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Lock, ArrowLeft, ShoppingCart, ChevronUp, ChevronDown, CheckCircle2, PlayCircle, Play, Maximize2, X } from "lucide-react";
 import { Header } from "@/components/Header";
 import { PaymentModal } from "@/components/PaymentModal";
-import { getCourse, formatPrice, type Lesson } from "@/lib/courses";
+import { getCourse, formatPrice, getCourseCoverImage, type Lesson } from "@/lib/courses";
 import { getVideoEmbedUrl, getVideoThumbnailUrl, getLessonProvider } from "@/lib/video";
 
 export const Route = createFileRoute("/khoa-hoc/$slug")({
@@ -297,6 +297,7 @@ function CourseDetail() {
         courseTitle={course.title}
         price={course.price}
         transferNote={`KH ${course.slug}`.slice(0, 50)}
+        coverImage={getCourseCoverImage(course)}
       />
     </div>
   );
