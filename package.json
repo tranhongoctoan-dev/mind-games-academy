@@ -4,9 +4,9 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "deploy": "gh-pages -d .output/public",
+    "deploy": "gh-pages -d dist",
     "dev": "npx vinxi dev",
-    "build": "npx vinxi build",
+    "build": "npx vinxi build && node ./scripts/post-build.mjs",
     "preview": "npx vinxi preview",
     "lint": "eslint .",
     "format": "prettier --write ."
