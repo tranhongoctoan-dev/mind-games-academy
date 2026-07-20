@@ -7,7 +7,7 @@
     "deploy": "gh-pages -d dist",
     "dev": "vite dev",
     "build": "vite build && node ./scripts/post-build.mjs",
-    "build:dev": "node ./scripts/post-build.mjs",
+    "build:dev": "vite build && node ./scripts/post-build.mjs",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write ."
