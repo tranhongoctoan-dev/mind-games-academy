@@ -1,10 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Lock, ArrowLeft, ShoppingCart, ChevronUp, ChevronDown, CheckCircle2, PlayCircle, Play } from "lucide-react";
+import { Lock, ArrowLeft, ShoppingCart, ChevronUp, ChevronDown, CheckCircle2, PlayCircle, Play, Maximize2, X } from "lucide-react";
 import { Header } from "@/components/Header";
 import { PaymentModal } from "@/components/PaymentModal";
 import { getCourse, formatPrice, type Lesson } from "@/lib/courses";
-import { getVideoEmbedUrl, getVideoThumbnailUrl } from "@/lib/video";
+import { getVideoEmbedUrl, getVideoThumbnailUrl, getLessonProvider } from "@/lib/video";
 
 export const Route = createFileRoute("/khoa-hoc/$slug")({
   loader: ({ params }) => {
@@ -45,20 +45,18 @@ function CourseDetail() {
   const { course } = Route.useLoaderData();
   const [activeIndex, setActiveIndex] = useState(0);
   const [payOpen, setPayOpen] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
   const touchStartY = useRef<number | null>(null);
   const wheelLock = useRef(false);
 
   const total = course.lessons.length;
   const goTo = useCallback(
-    (i: number) => {
-      const clamped = Math.max(0, Math.min(total - 1, i));
-      setActiveIndex(clamped);
-    },
+    (i: number) => setActiveIndex(Math.max(0, Math.min(total - 1, i))),
     [total]
   );
 
-  const next = () => goTo(activeIndex + 1);
-  const prev = () => goTo(activeIndex - 1);
+  const next = useCallback(() => goTo(activeIndex + 1), [goTo, activeIndex]);
+  const prev = useCallback(() => goTo(activeIndex - 1), [goTo, activeIndex]);
 
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY;
@@ -85,11 +83,21 @@ function CourseDetail() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowDown") next();
       else if (e.key === "ArrowUp") prev();
+      else if (e.key === "Escape") setFullscreen(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeIndex]);
+  }, [next, prev]);
+
+  // Lock body scroll while fullscreen
+  useEffect(() => {
+    if (!fullscreen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [fullscreen]);
 
   const activeLesson = course.lessons[activeIndex];
   const isLocked = !activeLesson.free;
@@ -98,7 +106,7 @@ function CourseDetail() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Feed player */}
+      {/* Inline feed player */}
       <div
         className="relative bg-navy select-none"
         onTouchStart={onTouchStart}
@@ -108,14 +116,26 @@ function CourseDetail() {
         <div className="mx-auto max-w-5xl">
           <div className="relative aspect-video w-full bg-black">
             <FeedSlide
-              key={activeIndex}
+              key={`inline-${activeIndex}`}
               lesson={activeLesson}
               locked={isLocked}
               price={course.price}
               onBuy={() => setPayOpen(true)}
+              onEnded={next}
+              autoplay={false}
             />
 
-            {/* Nav buttons */}
+            {/* Fullscreen toggle */}
+            {!isLocked && (
+              <button
+                onClick={() => setFullscreen(true)}
+                aria-label="Xem toàn màn hình"
+                className="absolute bottom-3 right-3 z-10 grid h-11 w-11 place-items-center rounded-full bg-black/60 text-white backdrop-blur active:scale-95"
+              >
+                <Maximize2 className="h-5 w-5" />
+              </button>
+            )}
+
             <div className="pointer-events-none absolute right-3 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-2">
               <button
                 onClick={prev}
@@ -135,7 +155,6 @@ function CourseDetail() {
               </button>
             </div>
 
-            {/* Progress pill */}
             <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-black/50 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
               {activeIndex + 1} / {total}
             </div>
@@ -210,6 +229,65 @@ function CourseDetail() {
         </ul>
       </div>
 
+      {/* Custom fullscreen overlay with swipe */}
+      {fullscreen && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col bg-black text-white select-none"
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+          onWheel={onWheel}
+        >
+          <div className="flex items-center justify-between px-4 py-3">
+            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold backdrop-blur">
+              {activeIndex + 1} / {total}
+            </span>
+            <button
+              onClick={() => setFullscreen(false)}
+              aria-label="Đóng toàn màn hình"
+              className="grid h-11 w-11 place-items-center rounded-full bg-white/10 backdrop-blur active:scale-95"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          <div className="relative flex-1">
+            <FeedSlide
+              key={`fs-${activeIndex}`}
+              lesson={activeLesson}
+              locked={isLocked}
+              price={course.price}
+              onBuy={() => setPayOpen(true)}
+              onEnded={next}
+              autoplay
+              fill
+            />
+
+            <div className="pointer-events-none absolute right-3 top-1/2 flex -translate-y-1/2 flex-col gap-3">
+              <button
+                onClick={prev}
+                disabled={activeIndex === 0}
+                aria-label="Bài trước"
+                className="pointer-events-auto grid h-12 w-12 place-items-center rounded-full bg-white/15 backdrop-blur disabled:opacity-30"
+              >
+                <ChevronUp className="h-6 w-6" />
+              </button>
+              <button
+                onClick={next}
+                disabled={activeIndex === total - 1}
+                aria-label="Bài tiếp theo"
+                className="pointer-events-auto grid h-12 w-12 place-items-center rounded-full bg-gold text-gold-foreground shadow-gold disabled:opacity-40"
+              >
+                <ChevronDown className="h-6 w-6" />
+              </button>
+            </div>
+          </div>
+
+          <p className="py-3 text-center text-xs text-white/70">
+            Vuốt lên: bài tiếp · Vuốt xuống: bài trước
+          </p>
+        </div>
+      )}
+
       <PaymentModal
         open={payOpen}
         onClose={() => setPayOpen(false)}
@@ -226,14 +304,68 @@ function FeedSlide({
   locked,
   price,
   onBuy,
+  onEnded,
+  autoplay = false,
+  fill = false,
 }: {
   lesson: Lesson;
   locked: boolean;
   price: number;
   onBuy: () => void;
+  onEnded?: () => void;
+  autoplay?: boolean;
+  fill?: boolean;
 }) {
   const thumb = getVideoThumbnailUrl(lesson);
-  const embed = getVideoEmbedUrl(lesson);
+  const embed = getVideoEmbedUrl(lesson, { autoplay });
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const provider = getLessonProvider(lesson);
+
+  // Detect video-ended via postMessage (YouTube IFrame API) without needing SDK
+  useEffect(() => {
+    if (locked || !onEnded) return;
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+
+    if (provider === "youtube") {
+      // Handshake to receive events
+      const sendListening = () => {
+        iframe.contentWindow?.postMessage(
+          JSON.stringify({ event: "listening", id: 1, channel: "widget" }),
+          "*"
+        );
+        iframe.contentWindow?.postMessage(
+          JSON.stringify({ event: "command", func: "addEventListener", args: ["onStateChange"] }),
+          "*"
+        );
+      };
+      const onLoad = () => sendListening();
+      iframe.addEventListener("load", onLoad);
+      // In case already loaded
+      sendListening();
+
+      const onMsg = (e: MessageEvent) => {
+        if (typeof e.data !== "string") return;
+        if (!e.origin.includes("youtube.com")) return;
+        try {
+          const data = JSON.parse(e.data);
+          // Ended state === 0
+          if (data?.event === "onStateChange" && data?.info === 0) {
+            onEnded();
+          }
+        } catch {
+          /* ignore */
+        }
+      };
+      window.addEventListener("message", onMsg);
+      return () => {
+        iframe.removeEventListener("load", onLoad);
+        window.removeEventListener("message", onMsg);
+      };
+    }
+  }, [locked, onEnded, provider, embed]);
+
+  const posClass = fill ? "absolute inset-0 h-full w-full" : "absolute inset-0 h-full w-full";
 
   if (locked) {
     return (
@@ -271,7 +403,8 @@ function FeedSlide({
 
   return (
     <iframe
-      className="absolute inset-0 h-full w-full"
+      ref={iframeRef}
+      className={posClass}
       src={embed}
       title={lesson.title}
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
