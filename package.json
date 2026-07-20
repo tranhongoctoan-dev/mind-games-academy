@@ -4,10 +4,10 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "deploy": "gh-pages -d .output/public",
-    "dev": "npx vinxi dev",
-    "build": "npx vinxi build",
-    "preview": "npx vinxi preview",
+    "dev": "vinxi dev",
+    "build": "vinxi build && node ./scripts/post-build.mjs",
+    "preview": "vinxi preview",
+    "start": "vinxi start",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
