@@ -113,7 +113,7 @@ function CourseDetail() {
         onTouchEnd={onTouchEnd}
         onWheel={onWheel}
       >
-        <div className="mx-auto max-w-5xl">
+        <div className="relative mx-auto max-w-5xl pb-14">
           <div className="relative aspect-video w-full bg-black">
             {!fullscreen && (
               <FeedSlide
@@ -138,28 +138,29 @@ function CourseDetail() {
               </button>
             )}
 
-            <div className="pointer-events-none absolute right-3 bottom-10 z-10 flex flex-col gap-2">
-              <button
-                onClick={prev}
-                disabled={activeIndex === 0}
-                aria-label="Bài trước"
-                className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-gold text-gold-foreground shadow-md ring-2 ring-white/30 opacity-90 backdrop-blur-sm transition hover:opacity-100 hover:shadow-lg active:scale-95 disabled:opacity-30"
-              >
-                <ChevronUp className="h-5 w-5" />
-              </button>
-              <button
-                onClick={next}
-                disabled={activeIndex === total - 1}
-                aria-label="Bài tiếp theo"
-                className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-gold text-gold-foreground shadow-md ring-2 ring-white/30 opacity-90 backdrop-blur-sm transition hover:opacity-100 hover:shadow-lg active:scale-95 disabled:opacity-30"
-              >
-                <ChevronDown className="h-5 w-5" />
-              </button>
-            </div>
-
             <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-black/50 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
               {activeIndex + 1} / {total}
             </div>
+          </div>
+
+          {/* Navigation buttons — placed outside the video board, above the hint text */}
+          <div className="pointer-events-none absolute right-3 bottom-3 z-10 flex flex-col gap-2">
+            <button
+              onClick={prev}
+              disabled={activeIndex === 0}
+              aria-label="Bài trước"
+              className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-gold text-gold-foreground shadow-md ring-2 ring-white/30 opacity-95 backdrop-blur-sm transition hover:opacity-100 hover:shadow-lg active:scale-95 disabled:opacity-30"
+            >
+              <ChevronUp className="h-5 w-5" />
+            </button>
+            <button
+              onClick={next}
+              disabled={activeIndex === total - 1}
+              aria-label="Bài tiếp theo"
+              className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-gold text-gold-foreground shadow-md ring-2 ring-white/30 opacity-95 backdrop-blur-sm transition hover:opacity-100 hover:shadow-lg active:scale-95 disabled:opacity-30"
+            >
+              <ChevronDown className="h-5 w-5" />
+            </button>
           </div>
         </div>
         <p className="py-2 text-center text-xs text-navy-foreground/70">
