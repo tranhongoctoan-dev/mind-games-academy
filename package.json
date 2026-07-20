@@ -78,6 +78,7 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "gh-pages": "^6.3.0",
     "globals": "^15.15.0",
+    "h3": "^2.0.1-rc.25",
     "nitro": "npm:nitro-nightly@latest",
     "prettier": "^3.7.3",
     "typescript": "^5.8.3",
