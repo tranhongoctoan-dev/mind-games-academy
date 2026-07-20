@@ -1,3 +1,5 @@
+import cover10SaiLamKhaiCuoc from "@/assets/cover-10-sai-lam-khai-cuoc.jpg";
+
 export type CourseType = "co-vua" | "co-tuong";
 export type VideoProvider = "youtube" | "bunny";
 
@@ -36,7 +38,7 @@ export const courses: Course[] = [
       "Khóa học do Đặc cấp đại sư Trịnh Duy Đồng giảng dạy, giúp bạn tránh những sai lầm phổ biến trong giai đoạn khai cuộc.",
     level: "Cơ bản",
     price: 50000,
-    coverImage: "https://video.bunnycdn.com/707946/5793ee13-5ffe-4df3-9d9d-d353e769c2e3/thumbnail.jpg",
+    coverImage: cover10SaiLamKhaiCuoc,
     lessons: [
       {
         title: "Bài 1: Xe cần xuất nhanh",
