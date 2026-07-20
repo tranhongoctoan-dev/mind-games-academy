@@ -1,8 +1,20 @@
 import { defineConfig } from 'vite'
+import viteReact from '@vitejs/plugin-react'
+import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+import { nitro } from 'nitro/vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
-// Actual build entry is app.config.ts (vinxi + @tanstack/start-config).
-// This file exists only for tooling that probes a vite.config.
 export default defineConfig({
-  plugins: [tsconfigPaths()],
+  plugins: [
+    tanstackStart({
+      srcDirectory: 'src',
+      router: {
+        routesDirectory: 'routes',
+        generatedRouteTree: 'routeTree.gen.ts',
+      },
+    }),
+    nitro(),
+    viteReact(),
+    tsconfigPaths(),
+  ],
 })
