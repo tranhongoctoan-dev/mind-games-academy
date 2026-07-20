@@ -127,7 +127,9 @@ export function getCourse(slug: string) {
 }
 
 export function getCourseCoverImage(course: Course): string | null {
-  return course.coverImage ?? null;
+  if (course.coverImage) return course.coverImage;
+  const first = course.lessons[0];
+  return first ? getVideoThumbnailUrl(first) : null;
 }
 
 export function formatPrice(price: number) {
