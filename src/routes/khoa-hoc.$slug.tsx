@@ -113,7 +113,7 @@ function CourseDetail() {
         onTouchEnd={onTouchEnd}
         onWheel={onWheel}
       >
-        <div className="mx-auto max-w-5xl">
+        <div className="relative mx-auto max-w-5xl pb-14">
           <div className="relative aspect-video w-full bg-black">
             {!fullscreen && (
               <FeedSlide
@@ -132,34 +132,35 @@ function CourseDetail() {
               <button
                 onClick={() => setFullscreen(true)}
                 aria-label="Xem toàn màn hình"
-                className="absolute bottom-3 right-3 z-10 grid h-11 w-11 place-items-center rounded-full bg-black/60 text-white backdrop-blur active:scale-95"
+                className="absolute bottom-3 left-3 z-10 grid h-11 w-11 place-items-center rounded-full bg-black/60 text-white backdrop-blur active:scale-95"
               >
                 <Maximize2 className="h-5 w-5" />
               </button>
             )}
 
-            <div className="pointer-events-none absolute right-1 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-1.5">
-              <button
-                onClick={prev}
-                disabled={activeIndex === 0}
-                aria-label="Bài trước"
-                className="pointer-events-auto grid h-6 w-6 place-items-center rounded-full bg-black/30 text-white/80 opacity-40 backdrop-blur-sm transition hover:bg-black/60 hover:opacity-90 active:opacity-100 disabled:opacity-20"
-              >
-                <ChevronUp className="h-3.5 w-3.5" />
-              </button>
-              <button
-                onClick={next}
-                disabled={activeIndex === total - 1}
-                aria-label="Bài tiếp theo"
-                className="pointer-events-auto grid h-6 w-6 place-items-center rounded-full bg-gold/50 text-gold-foreground opacity-60 backdrop-blur-sm transition hover:bg-gold hover:opacity-100 disabled:opacity-20"
-              >
-                <ChevronDown className="h-3.5 w-3.5" />
-              </button>
-            </div>
-
             <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-black/50 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
               {activeIndex + 1} / {total}
             </div>
+          </div>
+
+          {/* Navigation buttons — placed outside the video board, above the hint text */}
+          <div className="pointer-events-none absolute right-3 bottom-3 z-10 flex flex-col gap-2">
+            <button
+              onClick={prev}
+              disabled={activeIndex === 0}
+              aria-label="Bài trước"
+              className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-gold text-gold-foreground shadow-md ring-2 ring-white/30 opacity-95 backdrop-blur-sm transition hover:opacity-100 hover:shadow-lg active:scale-95 disabled:opacity-30"
+            >
+              <ChevronUp className="h-5 w-5" />
+            </button>
+            <button
+              onClick={next}
+              disabled={activeIndex === total - 1}
+              aria-label="Bài tiếp theo"
+              className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-gold text-gold-foreground shadow-md ring-2 ring-white/30 opacity-95 backdrop-blur-sm transition hover:opacity-100 hover:shadow-lg active:scale-95 disabled:opacity-30"
+            >
+              <ChevronDown className="h-5 w-5" />
+            </button>
           </div>
         </div>
         <p className="py-2 text-center text-xs text-navy-foreground/70">
@@ -264,22 +265,22 @@ function CourseDetail() {
               fill
             />
 
-            <div className="pointer-events-none absolute right-1 top-1/2 flex -translate-y-1/2 flex-col gap-1.5">
+            <div className="pointer-events-none absolute right-3 bottom-16 z-10 flex flex-col gap-2">
               <button
                 onClick={prev}
                 disabled={activeIndex === 0}
                 aria-label="Bài trước"
-                className="pointer-events-auto grid h-6 w-6 place-items-center rounded-full bg-white/15 opacity-40 backdrop-blur-sm transition hover:bg-white/30 hover:opacity-90 active:opacity-100 disabled:opacity-20"
+                className="pointer-events-auto grid h-11 w-11 place-items-center rounded-full bg-gold text-gold-foreground shadow-lg ring-2 ring-white/30 opacity-95 backdrop-blur-sm transition hover:opacity-100 hover:shadow-xl active:scale-95 disabled:opacity-30"
               >
-                <ChevronUp className="h-3.5 w-3.5" />
+                <ChevronUp className="h-6 w-6" />
               </button>
               <button
                 onClick={next}
                 disabled={activeIndex === total - 1}
                 aria-label="Bài tiếp theo"
-                className="pointer-events-auto grid h-6 w-6 place-items-center rounded-full bg-gold/50 text-gold-foreground opacity-60 backdrop-blur-sm transition hover:bg-gold hover:opacity-100 disabled:opacity-20"
+                className="pointer-events-auto grid h-11 w-11 place-items-center rounded-full bg-gold text-gold-foreground shadow-lg ring-2 ring-white/30 opacity-95 backdrop-blur-sm transition hover:opacity-100 hover:shadow-xl active:scale-95 disabled:opacity-30"
               >
-                <ChevronDown className="h-3.5 w-3.5" />
+                <ChevronDown className="h-6 w-6" />
               </button>
             </div>
           </div>
