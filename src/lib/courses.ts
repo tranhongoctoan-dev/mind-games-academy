@@ -17,6 +17,7 @@ export interface Course {
   description: string;
   level: string;
   price: number;
+  coverImage?: string;
   lessons: Lesson[];
 }
 
@@ -35,6 +36,7 @@ export const courses: Course[] = [
       "Khóa học do Đặc cấp đại sư Trịnh Duy Đồng giảng dạy, giúp bạn tránh những sai lầm phổ biến trong giai đoạn khai cuộc.",
     level: "Cơ bản",
     price: 50000,
+    coverImage: "https://video.bunnycdn.com/707946/5793ee13-5ffe-4df3-9d9d-d353e769c2e3/thumbnail.jpg",
     lessons: [
       {
         title: "Bài 1: Xe cần xuất nhanh",
@@ -120,6 +122,10 @@ export const courses: Course[] = [
 
 export function getCourse(slug: string) {
   return courses.find((c) => c.slug === slug);
+}
+
+export function getCourseCoverImage(course: Course): string | null {
+  return course.coverImage ?? null;
 }
 
 export function formatPrice(price: number) {
