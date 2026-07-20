@@ -2,6 +2,8 @@ import type { Lesson } from "./courses";
 
 const BUNNY_LIBRARY_ID =
   (import.meta.env.VITE_BUNNY_LIBRARY_ID as string | undefined) ?? "707946";
+const BUNNY_CDN_HOSTNAME =
+  (import.meta.env.VITE_BUNNY_CDN_HOSTNAME as string | undefined) ?? "";
 
 export function getLessonProvider(lesson: Lesson): "youtube" | "bunny" {
   return lesson.provider ?? "youtube";
@@ -23,9 +25,16 @@ export function getVideoEmbedUrl(lesson: Lesson, opts?: { autoplay?: boolean }):
 
 export function getVideoThumbnailUrl(lesson: Lesson): string | null {
   if (getLessonProvider(lesson) === "bunny") {
-    if (!BUNNY_LIBRARY_ID) return null;
-    return `https://video.bunnycdn.com/${BUNNY_LIBRARY_ID}/${lesson.videoId}/thumbnail.jpg`;
+    if (BUNNY_CDN_HOSTNAME) {
+      return `https://${BUNNY_CDN_HOSTNAME}/${lesson.videoId}/thumbnail.jpg`;
+    }
+    // Fallback preview poster via Bunny's iframe delivery
+    if (BUNNY_LIBRARY_ID) {
+      return `https://iframe.mediadelivery.net/preview.webp?libraryId=${BUNNY_LIBRARY_ID}&videoId=${lesson.videoId}`;
+    }
+    return null;
   }
 
   return `https://i.ytimg.com/vi/${lesson.videoId}/hqdefault.jpg`;
 }
+

@@ -1,4 +1,4 @@
-import cover10SaiLamKhaiCuoc from "@/assets/cover-10-sai-lam-khai-cuoc.jpg";
+import { getVideoThumbnailUrl } from "./video";
 
 export type CourseType = "co-vua" | "co-tuong";
 export type VideoProvider = "youtube" | "bunny";
@@ -38,7 +38,7 @@ export const courses: Course[] = [
       "Khóa học do Đặc cấp đại sư Trịnh Duy Đồng giảng dạy, giúp bạn tránh những sai lầm phổ biến trong giai đoạn khai cuộc.",
     level: "Cơ bản",
     price: 50000,
-    coverImage: cover10SaiLamKhaiCuoc,
+    // coverImage auto-derived from lesson 1 thumbnail via getCourseCoverImage()
     lessons: [
       {
         title: "Bài 1: Xe cần xuất nhanh",
@@ -127,7 +127,9 @@ export function getCourse(slug: string) {
 }
 
 export function getCourseCoverImage(course: Course): string | null {
-  return course.coverImage ?? null;
+  if (course.coverImage) return course.coverImage;
+  const first = course.lessons[0];
+  return first ? getVideoThumbnailUrl(first) : null;
 }
 
 export function formatPrice(price: number) {
