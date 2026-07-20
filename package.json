@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "deploy": "gh-pages -d dist",
-    "dev": "npx vinxi dev",
-    "build": "npx vinxi build && node ./scripts/post-build.mjs",
+    "dev": "vite dev",
+    "build": "vite build && node ./scripts/post-build.mjs",
     "build:dev": "node ./scripts/post-build.mjs",
-    "preview": "npx vinxi preview",
+    "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
