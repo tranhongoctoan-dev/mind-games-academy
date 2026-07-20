@@ -141,6 +141,28 @@ function CourseDetail() {
             <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-black/50 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
               {activeIndex + 1} / {total}
             </div>
+
+            {/* Compact nav pills — pinned to right edge, only visible when not fullscreen */}
+            {!fullscreen && (
+              <div className="absolute right-1.5 top-1/2 z-[60] flex w-7 -translate-y-1/2 flex-col gap-1 rounded-full bg-gold/95 p-0.5 opacity-70 shadow-md ring-1 ring-white/30 backdrop-blur-sm transition-opacity hover:opacity-100 active:opacity-100">
+                <button
+                  onClick={prev}
+                  disabled={activeIndex === 0}
+                  aria-label="Bài trước"
+                  className="grid h-6 w-6 place-items-center rounded-full text-gold-foreground active:scale-95 disabled:opacity-30"
+                >
+                  <ChevronUp className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={next}
+                  disabled={activeIndex === total - 1}
+                  aria-label="Bài tiếp theo"
+                  className="grid h-6 w-6 place-items-center rounded-full text-gold-foreground active:scale-95 disabled:opacity-30"
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+              </div>
+            )}
           </div>
 
         </div>
