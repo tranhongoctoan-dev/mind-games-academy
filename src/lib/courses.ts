@@ -1,4 +1,4 @@
-import cover10SaiLamKhaiCuoc from "@/assets/cover-10-sai-lam-khai-cuoc.jpg";
+import { getVideoThumbnailUrl } from "./video";
 
 export type CourseType = "co-vua" | "co-tuong";
 export type VideoProvider = "youtube" | "bunny";
