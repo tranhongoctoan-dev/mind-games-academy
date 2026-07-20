@@ -6,5 +6,8 @@ export default defineConfig({
   plugins: [
     tanstackStart(),
     tsconfigPaths()
-  ]
+  ],
+  server: {
+    preset: 'vercel',
+  },
 })
