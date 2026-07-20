@@ -1,6 +1,5 @@
 // Post-build: mirror static output to `dist/` so the project satisfies
-// tooling / hosts that expect a `dist` folder, while keeping `.vercel/output`
-// (Vercel Build Output API v3) and `.output/` intact for SSR/functions.
+// tooling / hosts that expect a `dist` folder.
 import { existsSync, rmSync, cpSync, mkdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 
