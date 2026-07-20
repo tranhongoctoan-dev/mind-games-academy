@@ -38,7 +38,7 @@ export const courses: Course[] = [
       "Khóa học do Đặc cấp đại sư Trịnh Duy Đồng giảng dạy, giúp bạn tránh những sai lầm phổ biến trong giai đoạn khai cuộc.",
     level: "Cơ bản",
     price: 50000,
-    coverImage: cover10SaiLamKhaiCuoc,
+    // coverImage auto-derived from lesson 1 thumbnail via getCourseCoverImage()
     lessons: [
       {
         title: "Bài 1: Xe cần xuất nhanh",
