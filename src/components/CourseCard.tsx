@@ -22,9 +22,6 @@ export function CourseCard({ course }: { course: Course }) {
             className="h-full w-full object-cover opacity-90 transition-transform duration-500 group-hover:scale-105"
           />
         ) : null}
-        <span className="absolute inset-0 grid place-items-center">
-          <PlayCircle className="h-12 w-12 text-gold drop-shadow-lg" />
-        </span>
         <span className="absolute left-3 top-3 rounded-full bg-navy/85 px-3 py-1 text-xs font-semibold text-navy-foreground">
           {label}
         </span>
