@@ -86,7 +86,7 @@ function CourseDetail() {
       {/* TikTok-style vertical scroll-snap feed */}
       <div
         ref={feedRef}
-        className="relative h-[100dvh] w-full snap-y snap-mandatory overflow-y-scroll bg-black overscroll-contain"
+        className="relative h-[calc(100dvh-4rem)] w-full snap-y snap-mandatory overflow-y-scroll bg-black overscroll-contain"
         style={{ scrollSnapType: "y mandatory" }}
       >
         {course.lessons.map((lesson, index) => (
@@ -96,10 +96,10 @@ function CourseDetail() {
             ref={(el) => {
               slideRefs.current[index] = el;
             }}
-            className="relative h-[100dvh] w-full snap-start snap-always overflow-hidden bg-black"
+            className="relative h-[calc(100dvh-4rem)] w-full snap-start snap-always overflow-hidden bg-black"
           >
             {/* Video area: leaves room for title bar (top) and controls (bottom) */}
-            <div className="absolute inset-x-0 top-10 bottom-20 flex items-center justify-center">
+            <div className="absolute inset-x-0 top-8 bottom-14 flex items-center justify-center">
               <div className="relative h-full w-full">
                 <FeedSlide
                   lesson={lesson}
