@@ -143,27 +143,6 @@ function CourseDetail() {
             </div>
           </div>
 
-          {/* Navigation pills — fixed to right-center of the video board */}
-          <div
-            className="absolute right-3 top-1/2 z-[60] flex -translate-y-1/2 flex-col gap-2 rounded-full bg-gold/95 p-1.5 shadow-xl ring-2 ring-white/40 backdrop-blur-sm"
-          >
-            <button
-              onClick={prev}
-              disabled={activeIndex === 0}
-              aria-label="Bài trước"
-              className="grid h-10 w-10 place-items-center rounded-full text-gold-foreground transition hover:bg-white/20 active:scale-95 disabled:opacity-30"
-            >
-              <ChevronUp className="h-5 w-5" />
-            </button>
-            <button
-              onClick={next}
-              disabled={activeIndex === total - 1}
-              aria-label="Bài tiếp theo"
-              className="grid h-10 w-10 place-items-center rounded-full text-gold-foreground transition hover:bg-white/20 active:scale-95 disabled:opacity-30"
-            >
-              <ChevronDown className="h-5 w-5" />
-            </button>
-          </div>
         </div>
         <p className="py-2 text-center text-xs text-navy-foreground/70">
           Vuốt lên / xuống hoặc dùng nút để chuyển bài
