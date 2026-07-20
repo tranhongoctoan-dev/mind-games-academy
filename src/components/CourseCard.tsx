@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { PlayCircle, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import type { Course } from "@/lib/courses";
 import { formatPrice } from "@/lib/courses";
 import { getVideoThumbnailUrl } from "@/lib/video";
