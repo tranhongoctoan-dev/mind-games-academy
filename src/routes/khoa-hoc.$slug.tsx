@@ -96,16 +96,21 @@ function CourseDetail() {
             ref={(el) => {
               slideRefs.current[index] = el;
             }}
-            className="relative flex h-[100dvh] w-full snap-start snap-always items-center justify-center bg-black"
+            className="relative h-[100dvh] w-full snap-start snap-always overflow-hidden bg-black"
           >
-            <FeedSlide
-              lesson={lesson}
-              locked={!lesson.free}
-              price={course.price}
-              onBuy={() => setPayOpen(true)}
-              onEnded={() => goTo(index + 1)}
-              active={index === activeIndex}
-            />
+            {/* Video area: leaves room for title bar (top) and controls (bottom) */}
+            <div className="absolute inset-x-0 top-10 bottom-20 flex items-center justify-center">
+              <div className="relative h-full w-full">
+                <FeedSlide
+                  lesson={lesson}
+                  locked={!lesson.free}
+                  price={course.price}
+                  onBuy={() => setPayOpen(true)}
+                  onEnded={() => goTo(index + 1)}
+                  active={index === activeIndex}
+                />
+              </div>
+            </div>
 
             {/* Overlay: index + lesson title */}
             <div className="pointer-events-none absolute left-3 top-3 z-10 flex items-center gap-2">
@@ -113,11 +118,11 @@ function CourseDetail() {
                 {index + 1} / {total}
               </span>
             </div>
-            <div className="pointer-events-none absolute inset-x-0 bottom-6 z-10 px-4 text-center">
+            <div className="pointer-events-none absolute inset-x-0 bottom-2 z-10 px-4 text-center">
               <p className="mx-auto max-w-md truncate rounded-full bg-black/50 px-4 py-1.5 text-sm font-semibold text-white backdrop-blur">
                 {lesson.title}
               </p>
-              <p className="mt-2 text-[11px] font-medium text-white/70">
+              <p className="mt-1 text-[11px] font-medium text-white/70">
                 Vuốt lên để xem bài tiếp theo
               </p>
             </div>
