@@ -19,6 +19,13 @@ export function CourseCard({ course }: { course: Course }) {
             src={thumbnail}
             alt={course.title}
             loading="lazy"
+            onError={(e) => {
+              const img = e.currentTarget;
+              if (!img.dataset.fallback) {
+                img.dataset.fallback = "1";
+                img.src = "/placeholder.svg";
+              }
+            }}
             className="h-full w-full object-cover opacity-90 transition-transform duration-500 group-hover:scale-105"
           />
         ) : null}
