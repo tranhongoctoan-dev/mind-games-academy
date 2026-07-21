@@ -17,8 +17,9 @@ export function CourseCard({ course }: { course: Course }) {
         {thumbnail ? (
           <img
             src={thumbnail}
-            alt={course.title}
+            alt={`Ảnh bìa khóa học ${course.title}`}
             loading="lazy"
+            decoding="async"
             onError={(e) => {
               const img = e.currentTarget;
               if (!img.dataset.fallback) {
@@ -26,8 +27,9 @@ export function CourseCard({ course }: { course: Course }) {
                 img.src = "/placeholder.svg";
               }
             }}
-            className="h-full w-full object-cover opacity-90 transition-transform duration-500 group-hover:scale-105"
+            className="block h-full w-full object-cover opacity-90 transition-transform duration-500 group-hover:scale-105"
           />
+
         ) : null}
         <span className="absolute left-3 top-3 rounded-full bg-navy/85 px-3 py-1 text-xs font-semibold text-navy-foreground">
           {label}
