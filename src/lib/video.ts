@@ -26,12 +26,12 @@ export function getVideoEmbedUrl(lesson: Lesson, opts?: { autoplay?: boolean }):
 
 export function getVideoThumbnailUrl(lesson: Lesson): string | null {
   if (getLessonProvider(lesson) === "bunny") {
+    const libId = lesson.libraryId ?? BUNNY_LIBRARY_ID;
     if (BUNNY_CDN_HOSTNAME) {
       return `https://${BUNNY_CDN_HOSTNAME}/${lesson.videoId}/thumbnail.jpg`;
     }
-    // Fallback preview poster via Bunny's iframe delivery
-    if (BUNNY_LIBRARY_ID) {
-      return `https://iframe.mediadelivery.net/preview.webp?libraryId=${BUNNY_LIBRARY_ID}&videoId=${lesson.videoId}`;
+    if (libId) {
+      return `https://iframe.mediadelivery.net/preview.webp?libraryId=${libId}&videoId=${lesson.videoId}`;
     }
     return null;
   }
