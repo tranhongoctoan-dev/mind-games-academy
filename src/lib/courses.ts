@@ -118,6 +118,7 @@ const rawCourses: Course[] = [
       "Khóa học do Đặc cấp đại sư Triệu Hâm Hâm giảng dạy, chia sẻ bí quyết học cờ hiệu quả từ căn bản.",
     level: "Cơ bản",
     price: 50000,
+    coverImage: "/cover-bi-quyet-hoc-co.jpg",
     bunnyLibraryId: "712397",
     lessons: [
       { title: "Bài 1", videoId: "613bef4c-ee9b-44d5-a52e-751d4a7df286", provider: "bunny", duration: "00:00", free: true },
