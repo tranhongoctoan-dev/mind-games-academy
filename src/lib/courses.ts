@@ -31,7 +31,7 @@ export const courseTypeLabels: Record<CourseType, string> = {
   "co-tuong": "Khóa học Cờ Tướng",
 };
 
-export const courses: Course[] = [
+const rawCourses: Course[] = [
   {
     slug: "10-sai-lam-khai-cuoc-co-tuong",
     legacySlugs: ["10-sai-lam-khai-cuoc-thuong-gap"],
