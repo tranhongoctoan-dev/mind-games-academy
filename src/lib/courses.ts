@@ -132,11 +132,13 @@ const rawCourses: Course[] = [
       { title: "Bài 10", videoId: "bda2f200-7779-489a-b71a-416f80181f10", provider: "bunny", duration: "00:00" },
     ],
   },
-].map((c) => (
+];
+
+export const courses: Course[] = rawCourses.map((c) =>
   c.bunnyLibraryId
     ? { ...c, lessons: c.lessons.map((l) => ({ ...l, libraryId: l.libraryId ?? c.bunnyLibraryId })) }
     : c
-));
+);
 
 
 export function getCourse(slug: string) {
