@@ -43,6 +43,7 @@ const rawCourses: Course[] = [
     level: "Cơ bản",
     price: 50000,
     coverImage: "/cover-trinh-duy-dong.jpg",
+    bunnyLibraryId: "707946",
     lessons: [
       {
         title: "Bài 1: Xe cần xuất nhanh",
