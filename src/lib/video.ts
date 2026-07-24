@@ -12,11 +12,12 @@ export function getLessonProvider(lesson: Lesson): "youtube" | "bunny" {
 export function getVideoEmbedUrl(lesson: Lesson, opts?: { autoplay?: boolean }): string {
   const autoplay = opts?.autoplay ? 1 : 0;
   if (getLessonProvider(lesson) === "bunny") {
-    if (!BUNNY_LIBRARY_ID) {
-      console.warn("VITE_BUNNY_LIBRARY_ID chưa được cấu hình — không thể phát video Bunny Stream.");
+    const libId = lesson.libraryId ?? BUNNY_LIBRARY_ID;
+    if (!libId) {
+      console.warn("Bunny library ID chưa được cấu hình — không thể phát video Bunny Stream.");
       return "";
     }
-    return `https://iframe.mediadelivery.net/embed/${BUNNY_LIBRARY_ID}/${lesson.videoId}?autoplay=${autoplay}&preload=true`;
+    return `https://iframe.mediadelivery.net/embed/${libId}/${lesson.videoId}?autoplay=${autoplay}&preload=true`;
   }
 
   const origin = typeof window !== "undefined" ? `&origin=${encodeURIComponent(window.location.origin)}` : "";
@@ -25,12 +26,12 @@ export function getVideoEmbedUrl(lesson: Lesson, opts?: { autoplay?: boolean }):
 
 export function getVideoThumbnailUrl(lesson: Lesson): string | null {
   if (getLessonProvider(lesson) === "bunny") {
+    const libId = lesson.libraryId ?? BUNNY_LIBRARY_ID;
     if (BUNNY_CDN_HOSTNAME) {
       return `https://${BUNNY_CDN_HOSTNAME}/${lesson.videoId}/thumbnail.jpg`;
     }
-    // Fallback preview poster via Bunny's iframe delivery
-    if (BUNNY_LIBRARY_ID) {
-      return `https://iframe.mediadelivery.net/preview.webp?libraryId=${BUNNY_LIBRARY_ID}&videoId=${lesson.videoId}`;
+    if (libId) {
+      return `https://iframe.mediadelivery.net/preview.webp?libraryId=${libId}&videoId=${lesson.videoId}`;
     }
     return null;
   }

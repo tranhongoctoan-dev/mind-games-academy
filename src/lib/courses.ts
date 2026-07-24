@@ -7,6 +7,7 @@ export interface Lesson {
   title: string;
   videoId: string;
   provider?: VideoProvider;
+  libraryId?: string;
   duration: string;
   free?: boolean;
 }
@@ -21,6 +22,7 @@ export interface Course {
   level: string;
   price: number;
   coverImage?: string;
+  bunnyLibraryId?: string;
   lessons: Lesson[];
 }
 
@@ -116,6 +118,7 @@ export const courses: Course[] = [
       "Khóa học do Đặc cấp đại sư Triệu Hâm Hâm giảng dạy, chia sẻ bí quyết học cờ hiệu quả từ căn bản.",
     level: "Cơ bản",
     price: 50000,
+    bunnyLibraryId: "712397",
     lessons: [
       { title: "Bài 1", videoId: "613bef4c-ee9b-44d5-a52e-751d4a7df286", provider: "bunny", duration: "00:00", free: true },
       { title: "Bài 2", videoId: "4f9f48f0-56ae-4fb2-a3d1-be25b35ecc75", provider: "bunny", duration: "00:00", free: true },
@@ -133,7 +136,15 @@ export const courses: Course[] = [
 
 
 export function getCourse(slug: string) {
-  return courses.find((c) => c.slug === slug || c.legacySlugs?.includes(slug));
+  const course = courses.find((c) => c.slug === slug || c.legacySlugs?.includes(slug));
+  if (!course) return undefined;
+  if (course.bunnyLibraryId) {
+    return {
+      ...course,
+      lessons: course.lessons.map((l) => ({ ...l, libraryId: l.libraryId ?? course.bunnyLibraryId })),
+    };
+  }
+  return course;
 }
 
 export function getCourseCoverImage(course: Course): string | null {
