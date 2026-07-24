@@ -31,7 +31,7 @@ export const courseTypeLabels: Record<CourseType, string> = {
   "co-tuong": "Khóa học Cờ Tướng",
 };
 
-export const courses: Course[] = [
+const rawCourses: Course[] = [
   {
     slug: "10-sai-lam-khai-cuoc-co-tuong",
     legacySlugs: ["10-sai-lam-khai-cuoc-thuong-gap"],
@@ -134,17 +134,15 @@ export const courses: Course[] = [
   },
 ];
 
+export const courses: Course[] = rawCourses.map((c) =>
+  c.bunnyLibraryId
+    ? { ...c, lessons: c.lessons.map((l) => ({ ...l, libraryId: l.libraryId ?? c.bunnyLibraryId })) }
+    : c
+);
+
 
 export function getCourse(slug: string) {
-  const course = courses.find((c) => c.slug === slug || c.legacySlugs?.includes(slug));
-  if (!course) return undefined;
-  if (course.bunnyLibraryId) {
-    return {
-      ...course,
-      lessons: course.lessons.map((l) => ({ ...l, libraryId: l.libraryId ?? course.bunnyLibraryId })),
-    };
-  }
-  return course;
+  return courses.find((c) => c.slug === slug || c.legacySlugs?.includes(slug));
 }
 
 export function getCourseCoverImage(course: Course): string | null {
