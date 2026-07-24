@@ -132,19 +132,15 @@ export const courses: Course[] = [
       { title: "Bài 10", videoId: "bda2f200-7779-489a-b71a-416f80181f10", provider: "bunny", duration: "00:00" },
     ],
   },
-];
+].map((c) => (
+  c.bunnyLibraryId
+    ? { ...c, lessons: c.lessons.map((l) => ({ ...l, libraryId: l.libraryId ?? c.bunnyLibraryId })) }
+    : c
+));
 
 
 export function getCourse(slug: string) {
-  const course = courses.find((c) => c.slug === slug || c.legacySlugs?.includes(slug));
-  if (!course) return undefined;
-  if (course.bunnyLibraryId) {
-    return {
-      ...course,
-      lessons: course.lessons.map((l) => ({ ...l, libraryId: l.libraryId ?? course.bunnyLibraryId })),
-    };
-  }
-  return course;
+  return courses.find((c) => c.slug === slug || c.legacySlugs?.includes(slug));
 }
 
 export function getCourseCoverImage(course: Course): string | null {
