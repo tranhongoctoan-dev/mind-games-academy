@@ -13,6 +13,7 @@ export interface Lesson {
 
 export interface Course {
   slug: string;
+  legacySlugs?: string[];
   type: CourseType;
   title: string;
   instructor: string;
@@ -31,6 +32,7 @@ export const courseTypeLabels: Record<CourseType, string> = {
 export const courses: Course[] = [
   {
     slug: "10-sai-lam-khai-cuoc-co-tuong",
+    legacySlugs: ["10-sai-lam-khai-cuoc-thuong-gap"],
     type: "co-tuong",
     title: "10 Sai Lầm Khai Cuộc Thường Gặp",
     instructor: "Đặc cấp Đại sư Trịnh Duy Đồng",
@@ -123,7 +125,7 @@ export const courses: Course[] = [
 ];
 
 export function getCourse(slug: string) {
-  return courses.find((c) => c.slug === slug);
+  return courses.find((c) => c.slug === slug || c.legacySlugs?.includes(slug));
 }
 
 export function getCourseCoverImage(course: Course): string | null {
