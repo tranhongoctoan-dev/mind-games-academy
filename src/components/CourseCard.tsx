@@ -45,7 +45,7 @@ export function CourseCard({ course }: { course: Course }) {
         <div className="mt-auto flex items-center justify-between pt-3">
           <span className="text-base font-bold text-gold">{formatPrice(course.price)}</span>
           <span className="inline-flex items-center gap-1 text-sm font-semibold text-foreground">
-            Xem học <ArrowRight className="h-4 w-4" />
+            Vào học <ArrowRight className="h-4 w-4" />
           </span>
         </div>
       </div>
