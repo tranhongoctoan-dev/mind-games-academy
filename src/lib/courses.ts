@@ -136,7 +136,15 @@ export const courses: Course[] = [
 
 
 export function getCourse(slug: string) {
-  return courses.find((c) => c.slug === slug || c.legacySlugs?.includes(slug));
+  const course = courses.find((c) => c.slug === slug || c.legacySlugs?.includes(slug));
+  if (!course) return undefined;
+  if (course.bunnyLibraryId) {
+    return {
+      ...course,
+      lessons: course.lessons.map((l) => ({ ...l, libraryId: l.libraryId ?? course.bunnyLibraryId })),
+    };
+  }
+  return course;
 }
 
 export function getCourseCoverImage(course: Course): string | null {
