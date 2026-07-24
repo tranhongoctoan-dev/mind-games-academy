@@ -7,6 +7,7 @@ export interface Lesson {
   title: string;
   videoId: string;
   provider?: VideoProvider;
+  libraryId?: string;
   duration: string;
   free?: boolean;
 }
@@ -21,6 +22,7 @@ export interface Course {
   level: string;
   price: number;
   coverImage?: string;
+  bunnyLibraryId?: string;
   lessons: Lesson[];
 }
 
