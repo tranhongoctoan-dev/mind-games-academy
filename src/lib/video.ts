@@ -12,11 +12,12 @@ export function getLessonProvider(lesson: Lesson): "youtube" | "bunny" {
 export function getVideoEmbedUrl(lesson: Lesson, opts?: { autoplay?: boolean }): string {
   const autoplay = opts?.autoplay ? 1 : 0;
   if (getLessonProvider(lesson) === "bunny") {
-    if (!BUNNY_LIBRARY_ID) {
-      console.warn("VITE_BUNNY_LIBRARY_ID chưa được cấu hình — không thể phát video Bunny Stream.");
+    const libId = lesson.libraryId ?? BUNNY_LIBRARY_ID;
+    if (!libId) {
+      console.warn("Bunny library ID chưa được cấu hình — không thể phát video Bunny Stream.");
       return "";
     }
-    return `https://iframe.mediadelivery.net/embed/${BUNNY_LIBRARY_ID}/${lesson.videoId}?autoplay=${autoplay}&preload=true`;
+    return `https://iframe.mediadelivery.net/embed/${libId}/${lesson.videoId}?autoplay=${autoplay}&preload=true`;
   }
 
   const origin = typeof window !== "undefined" ? `&origin=${encodeURIComponent(window.location.origin)}` : "";
